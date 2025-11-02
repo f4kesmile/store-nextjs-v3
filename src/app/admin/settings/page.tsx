@@ -70,89 +70,76 @@ export default function SettingsPage(){
           </Card>
 
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Preferensi</CardTitle><CardDescription>Bahasa/Locale</CardDescription></CardHeader>
-            <CardContent className="space-y-3">
-              <Select value={formData.locale} onValueChange={(v)=>setFormData({...formData, locale:v})}>
-                <SelectTrigger><SelectValue placeholder="Bahasa"/></SelectTrigger>
-                <SelectContent><SelectItem value="id">Indonesia</SelectItem><SelectItem value="en">English</SelectItem></SelectContent>
-              </Select>
-              <Button variant="outline" disabled={saving}>{saving?"Menyimpan...":"Simpan Preferensi"}</Button>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Brand & Tema</CardTitle><CardDescription>Logo, favicon, warna, dan tema</CardDescription></CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Upload Logo</label>
+                  <input className="block w-full text-sm" type="file" accept="image/*" onChange={(e)=>uploadFile("logo", e.target.files?.[0])} />
+                  <div className="h-12 w-12 rounded bg-muted overflow-hidden grid place-items-center border">
+                    {formData.logoUrl ? (<img src={formData.logoUrl} alt="logo" className="max-h-12" />) : (<div className="text-xs text-muted-foreground">Logo</div>)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{uploadingLogo?"Mengunggah...":"PNG/JPG transparan direkomendasikan"}</div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Upload Favicon</label>
+                  <input className="block w-full text-sm" type="file" accept="image/x-icon,image/png" onChange={(e)=>uploadFile("favicon", e.target.files?.[0])} />
+                  <div className="h-8 w-8 rounded bg-muted overflow-hidden grid place-items-center border">
+                    {formData.faviconUrl ? (<img src={formData.faviconUrl} alt="favicon" className="max-h-8" />) : (<div className="text-[10px] text-muted-foreground">ico</div>)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{uploadingFavicon?"Mengunggah...":"PNG 32x32 atau ICO"}</div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Primary</label>
+                      <Input type="color" value={formData.primaryColor} onChange={(e)=>setFormData({...formData, primaryColor: e.target.value})}/>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Secondary</label>
+                      <Input type="color" value={formData.secondaryColor} onChange={(e)=>setFormData({...formData, secondaryColor: e.target.value})}/>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">Tema default</label>
+                    <Select value={formData.theme} onValueChange={(v)=>setFormData({...formData, theme: v as "light" | "dark"})}>
+                      <SelectTrigger><SelectValue placeholder="Tema default"/></SelectTrigger>
+                      <SelectContent><SelectItem value="light">Light</SelectItem><SelectItem value="dark">Dark</SelectItem></SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-2">
+                <div className="text-sm text-muted-foreground">Preview</div>
+                <div className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded bg-muted overflow-hidden grid place-items-center">
+                      {formData.logoUrl ? (<img src={formData.logoUrl} alt="logo" className="max-h-10"/>) : (<div className="text-xs text-muted-foreground">Logo</div>)}
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="size-6 rounded" style={{ background: formData.primaryColor }} />
+                      <span className="size-6 rounded" style={{ background: formData.secondaryColor }} />
+                    </div>
+                    <div className="ml-auto flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Favicon</span>
+                      <div className="size-6 rounded overflow-hidden bg-muted grid place-items-center">
+                        {formData.faviconUrl ? (<img src={formData.faviconUrl} alt="favicon" className="max-h-6" />) : (<div className="text-[10px] text-muted-foreground">ico</div>)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">Tema: {formData.theme}</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Brand & Tema</CardTitle><CardDescription>Logo, favicon, warna, dan tema</CardDescription></CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-3">
-              <label className="text-sm text-muted-foreground">Upload Logo</label>
-              <div className="flex items-center gap-3">
-                <input type="file" accept="image/*" onChange={(e)=>uploadFile("logo", e.target.files?.[0])} />
-                <Button type="button" variant="outline" disabled>{uploadingLogo?"Mengunggah...":"Pilih File"}</Button>
-              </div>
-              {formData.logoUrl && (
-                <div className="h-12 w-12 rounded bg-muted overflow-hidden grid place-items-center">
-                  <img src={formData.logoUrl} alt="logo" className="max-h-12" />
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <label className="text-sm text-muted-foreground">Upload Favicon</label>
-              <div className="flex items-center gap-3">
-                <input type="file" accept="image/x-icon,image/png" onChange={(e)=>uploadFile("favicon", e.target.files?.[0])} />
-                <Button type="button" variant="outline" disabled>{uploadingFavicon?"Mengunggah...":"Pilih File"}</Button>
-              </div>
-              {formData.faviconUrl && (
-                <div className="h-8 w-8 rounded bg-muted overflow-hidden grid place-items-center">
-                  <img src={formData.faviconUrl} alt="favicon" className="max-h-8" />
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-sm text-muted-foreground">Primary</label>
-                  <Input type="color" value={formData.primaryColor} onChange={(e)=>setFormData({...formData, primaryColor: e.target.value})}/>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm text-muted-foreground">Secondary</label>
-                  <Input type="color" value={formData.secondaryColor} onChange={(e)=>setFormData({...formData, secondaryColor: e.target.value})}/>
-                </div>
-              </div>
-              <Select value={formData.theme} onValueChange={(v)=>setFormData({...formData, theme: v as "light" | "dark"})}>
-                <SelectTrigger><SelectValue placeholder="Tema default"/></SelectTrigger>
-                <SelectContent><SelectItem value="light">Light</SelectItem><SelectItem value="dark">Dark</SelectItem></SelectContent>
-              </Select>
-            </div>
-
-            <div className="md:col-span-3 space-y-3">
-              <div className="text-sm text-muted-foreground">Preview</div>
-              <div className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded bg-muted overflow-hidden grid place-items-center">
-                    {formData.logoUrl ? (<img src={formData.logoUrl} alt="logo" className="max-h-10"/>) : (<div className="text-xs text-muted-foreground">Logo</div>)}
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="size-6 rounded" style={{ background: formData.primaryColor }} />
-                    <span className="size-6 rounded" style={{ background: formData.secondaryColor }} />
-                  </div>
-                  <div className="ml-auto flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Favicon</span>
-                    <div className="size-6 rounded overflow-hidden bg-muted grid place-items-center">
-                      {formData.faviconUrl ? (<img src={formData.faviconUrl} alt="favicon" className="max-h-6" />) : (<div className="text-[10px] text-muted-foreground">ico</div>)}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">Tema: {formData.theme}</div>
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" disabled={saving} className="flex-1">{saving?"Menyimpan...":"Simpan Brand & Tema"}</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex gap-2">
+          <Button type="submit" disabled={saving} className="ml-auto">{saving?"Menyimpan...":"Simpan Brand & Tema"}</Button>
+        </div>
       </form>
     </div>
   );
